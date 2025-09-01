@@ -46,7 +46,22 @@
     display:grid; grid-template-columns: 1.6fr 1fr; gap:28px; align-items:stretch;
   }
   @media (max-width: 980px){
-    .grid{grid-template-columns:1fr}
+    .grid{grid-template-columns:1fr; gap:20px}
+  }
+  
+  /* Mobile container and spacing improvements */
+  @media (max-width: 720px){
+    .container{padding:12px}
+    .grid{gap:16px}
+    h1{font-size:28px; line-height:1.2; margin:12px 0 16px}
+    .meta{margin-top:8px; flex-wrap:wrap; gap:8px}
+    .details{margin-top:20px; padding-top:16px}
+  }
+  
+  @media (max-width: 480px){
+    .container{padding:8px}
+    h1{font-size:24px}
+    .breadcrumb{font-size:12px; margin-bottom:8px}
   }
   /* Slideshow with curved corners + offset peach frame */
   .media-wrap{
@@ -114,6 +129,19 @@
     border-radius:18px; padding:18px; background:var(--card); border:1px solid #eee; box-shadow:0 10px 24px rgba(0,0,0,.06);
     display:flex; flex-direction:column; justify-content:flex-start;
   }
+  
+  /* Mobile booking card improvements */
+  @media (max-width: 720px){
+    .card{padding:16px; border-radius:16px; position:static}
+    .price .amt{font-size:24px}
+    .host{margin-top:12px}
+    .host img{width:44px; height:44px}
+  }
+  
+  @media (max-width: 480px){
+    .card{padding:14px; border-radius:14px}
+    .price .amt{font-size:22px}
+  }
   .price{display:flex; align-items:baseline; gap:10px}
   .price .amt{font-size:28px; font-weight:800}
   .field{border:1px solid #e9e9e9; border-radius:12px; padding:14px; margin:10px 0; display:flex; align-items:center; justify-content:space-between; color:#333; font-weight:600}
@@ -129,7 +157,23 @@
   .li-text .sub{display:block; font-size:13px; color:#555}
   .li-icon{display:flex; align-items:center; justify-content:center}
   .li-icon svg{width:40px; height:40px; stroke:var(--brand-green); stroke-linecap:round; stroke-linejoin:round; opacity:.9}
-  @media (max-width: 720px){ .list{grid-template-columns: 1fr 1fr} }
+  
+  /* Mobile optimizations */
+  @media (max-width: 720px){ 
+    .list{grid-template-columns: 1fr 1fr; gap:12px}
+    .li{min-height:100px; padding:16px; grid-template-columns:60px 1fr}
+    .li-icon svg{width:36px; height:36px}
+    .li-text strong{font-size:15px}
+    .li-text .sub{font-size:12px; line-height:1.3}
+  }
+  
+  @media (max-width: 480px){
+    .list{grid-template-columns: 1fr; gap:10px}
+    .li{min-height:80px; padding:14px; grid-template-columns:50px 1fr}
+    .li-icon svg{width:32px; height:32px}
+    .li-text strong{font-size:14px}
+    .li-text .sub{font-size:11px}
+  }
   /* Footer note */
   footer{margin:50px 0 30px; color:var(--ink-60); text-align:center}
     </style>
