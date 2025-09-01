@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rebellion Roads — Outer Banks eBike Tour</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root{
+    --brand-green:#136a5a;      /* Rebellion Roads primary */
+    --brand-green-700:#0e5247;
+    --accent-peach:#dff3ed;     /* offset frame (light brand green) */
+    --ink:#1e1e1e;
+    --ink-60:#6a6a6a;
+    --card:#ffffff;
+    --bg:#faf9f7;
+    --radius-24:24px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Montserrat, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    color:var(--ink);
+    background:var(--bg);
+  }
+  a{color:var(--brand-green); text-decoration:none}
+  .container{max-width:1200px; margin:0 auto; padding:16px}
+  /* Layout like the reference: media left, booking card right */
+  .grid{
+    display:grid; grid-template-columns: 1.6fr 1fr; gap:28px; align-items:stretch;
+  }
+  @media (max-width: 980px){
+    .grid{grid-template-columns:1fr}
+  }
+  /* Slideshow with curved corners + offset peach frame */
+  .media-wrap{
+    position:relative;
+    border-radius:var(--radius-24);
+    background:transparent;
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+  }
+  .media-wrap::before{
+    content:"";
+    position:absolute; inset:-14px -14px auto auto;
+    height:100%; width:100%;
+    border-radius:calc(var(--radius-24) + 14px);
+    background:var(--accent-peach);
+    z-index:-1;
+    transform:rotate(-2deg) translate(4px,12px); /* subtle left shift, less exposure */
+    box-shadow:0 12px 24px rgba(0,0,0,.06);
+  }
+  .media-inner{ border-radius:var(--radius-24); overflow:hidden; background:#000; }
+  .slider{
+    position:relative; width:100%; aspect-ratio: 16/9; background:#111; overflow:hidden;
+  }
+  @media (min-width: 981px){
+    .slider{ aspect-ratio: auto; height:100% }
+  }
+  .slides{display:flex; height:100%; transition:transform .5s ease}
+  .slide{
+    min-width:100%; height:100%; position:relative; user-select:none;
+  }
+  .slide img, .slide video{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .ctrl{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:space-between;
+  }
+  .btn{
+    pointer-events:auto;
+    width:42px; height:42px; border:none; border-radius:999px;
+    background:rgba(255,255,255,.88); color:#222; display:grid; place-items:center; cursor:pointer;
+    margin:0 10px; box-shadow:0 3px 10px rgba(0,0,0,.15);
+  }
+  .btn:active{transform:translateY(1px)}
+  .save{
+    position:absolute; right:14px; top:14px; z-index:3;
+    background:#fff; border-radius:999px; padding:8px 14px; display:flex; align-items:center; gap:8px; font-weight:700;
+    box-shadow:0 3px 10px rgba(0,0,0,.15);
+  }
+  .progress{
+    position:absolute; left:20px; right:20px; bottom:14px; height:4px; border-radius:999px; background:rgba(255,255,255,.35); overflow:hidden;
+  }
+  .progress > i{display:block; height:100%; width:0%; background:#fff}
+  .dots{position:absolute; left:20px; bottom:24px; display:flex; gap:6px}
+  .dot{width:6px; height:6px; border-radius:999px; background:rgba(255,255,255,.55)}
+  .dot.active{background:#fff}
+  /* Title, rating, meta row below hero */
+  .meta{
+    display:flex; align-items:center; gap:10px; color:var(--ink-60); font-weight:600; margin-top:10px;
+  }
+  .rating{color:#b6005c}
+  h1{margin:8px 0 12px; font-size:34px}
+  .breadcrumb{color:var(--ink-60); font-size:14px}
+  /* Booking card */
+  .card{
+    position:sticky; top:0;
+    border-radius:18px; padding:18px; background:var(--card); border:1px solid #eee; box-shadow:0 10px 24px rgba(0,0,0,.06);
+    display:flex; flex-direction:column; justify-content:flex-start;
+  }
+  .price{display:flex; align-items:baseline; gap:10px}
+  .price .amt{font-size:28px; font-weight:800}
+  .field{border:1px solid #e9e9e9; border-radius:12px; padding:14px; margin:10px 0; display:flex; align-items:center; justify-content:space-between; color:#333; font-weight:600}
+  .cta{display:block; width:100%; background:var(--brand-green); color:#fff; padding:14px 16px; border-radius:12px; border:none; font-weight:800; cursor:pointer}
+  .host{display:flex; align-items:center; gap:10px; margin-top:8px}
+  .host img{width:48px; height:48px; border-radius:50%; object-fit:cover; border:3px solid #fff; box-shadow:0 2px 8px rgba(0,0,0,.12)}
+  /* Details / icons section */
+  .details{margin-top:28px; border-top:1px solid #eee; padding-top:22px}
+  .list{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px}
+  .li{background:#fff; border:1px solid #eee; border-radius:14px; padding:14px; display:grid; grid-template-columns:72px 1fr; align-items:center; min-height:84px}
+  .li-text{font-weight:600; color:#333}
+  .li-text strong{display:block; font-weight:800; font-size:16px; margin-bottom:2px}
+  .li-text .sub{display:block; font-size:13px; color:#555}
+  .li-icon{display:flex; align-items:center; justify-content:center}
+  .li-icon svg{width:40px; height:40px; stroke:var(--brand-green); stroke-linecap:round; stroke-linejoin:round; opacity:.9}
+  @media (max-width: 720px){ .list{grid-template-columns: 1fr 1fr} }
+  /* Footer note */
+  footer{margin:50px 0 30px; color:var(--ink-60); text-align:center}
+    </style>
+</head>
+<body>
+
+<main class="container">
+  <div class="breadcrumb">South Carolina › Charleston › Tours › Outer Banks Film Locations eBike Tour</div>
+
+  <div class="grid" style="margin-top:14px">
+    <!-- LEFT: Slideshow with video first -->
+    <section style="display:flex; flex-direction:column">
+      <div class="media-wrap" style="height:100%">
+        <button class="save">Save <span>♡</span></button>
+
+        <div class="media-inner">
+        <div class="slider" id="obx-slider" aria-label="Outer Banks media gallery" style="height:100%">
+          <div class="slides">
+            <!-- Slide 0: video first -->
+            <div class="slide" aria-roledescription="slide" aria-label="1 of 6">
+              <img alt="Outer Banks tour — animated highlights" src="media/obx-hero.gif">
+            </div>
+
+            <!-- Slides 1..n: images (REPLACE with RR Outer Banks photos/IG) -->
+            <div class="slide" aria-roledescription="slide" aria-label="2 of 6">
+              <img alt="Shem Creek boardwalk — Outer Banks filming spot" src="media/obx-1.jpg" loading="lazy">
+            </div>
+            <div class="slide" aria-roledescription="slide" aria-label="3 of 6">
+              <img alt="Old Village streets on eBikes" src="media/obx-2.jpg" loading="lazy">
+            </div>
+            <div class="slide" aria-roledescription="slide" aria-label="4 of 6">
+              <img alt="Breach Inlet lookout" src="media/obx-1.jpg" loading="lazy">
+            </div>
+            <div class="slide" aria-roledescription="slide" aria-label="5 of 6">
+              <img alt="Kildare County Sheriff exterior filming site" src="media/obx-1.jpg" loading="lazy">
+            </div>
+            <div class="slide" aria-roledescription="slide" aria-label="6 of 6">
+              <img alt="Group on Rebellion Roads eBikes" src="media/obx-1.jpg" loading="lazy">
+            </div>
+          </div>
+
+          <div class="ctrl">
+            <button class="btn" data-dir="-1" aria-label="Previous slide">❮</button>
+            <button class="btn" data-dir="1" aria-label="Next slide">❯</button>
+          </div>
+
+          <div class="progress" aria-hidden="true"><i></i></div>
+          <div class="dots" aria-hidden="true"></div>
+        </div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <span class="rating">★★★★★</span>
+        <span>4.9</span>
+        <a href="#reviews">112 reviews</a>
+      </div>
+
+      <h1>Outer Banks Film Locations eBike Tour</h1>
+      <div class="meta">
+        <span>2.5–3 hours</span>
+        <span>·</span>
+        <span>Mount Pleasant, Shem Creek, & Old Village</span>
+        <span>·</span>
+        <span>Private or small group</span>
+      </div>
+
+      <section class="details">
+        <p>
+          Ride with Rebellion Roads through Charleston's most iconic "Outer Banks" filming spots on premium eBikes.
+          See Kiara's house in the Old Village, The Wreck on Shem Creek, the Sheriff's Office exterior, and more —
+          with stories, photo stops, and coastal breezes the whole way.
+        </p>
+
+        <div class="list">
+          <div class="li">
+            <div class="li-icon" aria-hidden="true">
+              <!-- Hand‑drawn camera icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                <!-- body -->
+                <rect x="3" y="7" width="18" height="12" rx="2"/>
+                <!-- top ridge -->
+                <path d="M7 7l1.5-2h7L17 7"/>
+                <!-- lens -->
+                <circle cx="12" cy="13" r="3.2"/>
+                <circle cx="12" cy="13" r="1.2"/>
+                <!-- flash -->
+                <rect x="16.5" y="9" width="2.5" height="1.5" rx="0.3"/>
+              </svg>
+            </div>
+            <div class="li-text"><strong>Includes</strong><span class="sub">eBike, helmet, lock, tutorial, local guide</span></div>
+          </div>
+          <div class="li">
+            <div class="li-icon" aria-hidden="true">
+              <!-- Hand‑drawn gauge -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                <path d="M4 14a8 8 0 1116 0"/>
+                <path d="M12 14l4-4"/>
+                <path d="M6 14h.01M12 14h.01M18 14h.01"/>
+              </svg>
+            </div>
+            <div class="li-text"><strong>Skill level</strong><span class="sub">Great for beginners; electric assist flattens the ride</span></div>
+          </div>
+          <div class="li">
+            <div class="li-icon" aria-hidden="true">
+              <!-- Hand‑drawn sneaker icon (clearer silhouette) -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                <!-- upper with heel tab and toe -->
+                <path d="M3 13l4 3h12a2.5 2.5 0 000-5h-1l-4-3-2 2-3-2-2 2-1-2"/>
+                <!-- rounded toe/sole run -->
+                <path d="M7 16h12a2.5 2.5 0 002.5-2.5"/>
+                <!-- laces -->
+                <path d="M9 12h1.2M11.2 12h1.2M13.4 12h1.2"/>
+                <!-- toe lift hint -->
+                <path d="M3 13c0 1.2 1.2 3 4 3"/>
+              </svg>
+            </div>
+            <div class="li-text"><strong>What to bring</strong><span class="sub">Closed-toe shoes, water, sunscreen</span></div>
+          </div>
+          <div class="li">
+            <div class="li-icon" aria-hidden="true">
+              <!-- Hand‑drawn clock -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                <circle cx="12" cy="12" r="8.5"/>
+                <path d="M12 7v5l3 2"/>
+              </svg>
+            </div>
+            <div class="li-text"><strong>Start times</strong><span class="sub">9:00 AM and 12:00 PM daily</span></div>
+          </div>
+          <div class="li">
+            <div class="li-icon" aria-hidden="true">
+              <!-- Hand‑drawn calendar -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                <rect x="3" y="5" width="18" height="14" rx="2"/>
+                <path d="M3 9h18M8 3v4M16 3v4"/>
+              </svg>
+            </div>
+            <div class="li-text"><strong>Cancellation</strong><span class="sub">24h notice or weather: full refund</span></div>
+          </div>
+          <div class="li">
+            <div class="li-icon" aria-hidden="true">
+              <!-- Height requirement: ruler with person silhouette (styled to match provided icon) -->
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6">
+                <!-- Ruler with ticks -->
+                <path d="M5 4v16"/>
+                <path d="M5 8h3M5 11h3M5 14h3M5 17h3"/>
+                <!-- Ground line and top bar -->
+                <path d="M4 20h10M5 6h7"/>
+                <!-- Person silhouette -->
+                <circle cx="15.5" cy="7.5" r="1.8"/>
+                <path d="M15.5 9.5v5"/>
+                <path d="M13.8 11.5l1.7 2 1.7-2"/>
+                <path d="M14.6 21v-6M16.4 21v-6"/>
+              </svg>
+            </div>
+            <div class="li-text"><strong>Height</strong><span class="sub">Riders 4'11"+ able to ride a bike</span></div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <!-- RIGHT: Booking card -->
+    <aside class="card">
+      <div class="price" style="margin-bottom:8px">
+        <span class="amt">$129.00</span>
+        <span>/ person</span>
+      </div>
+      <div class="meta" style="margin:8px 0 16px 0">
+        <span class="rating">★★★★★</span><a href="#reviews">112 reviews</a>
+      </div>
+
+      <!-- Peek Pro embed: replace data attributes with your real IDs/URLs -->
+      <div id="peek-widget" class="peek-widget">
+        <a
+          class="peek-book-button-flat"
+          href="https://book.peek.com/s/479b9599-bb8b-4002-a17b-ffc7f5a8a988/ykMDe"
+          target="_blank" rel="noopener noreferrer"
+          data-purchase-type="activity"
+          data-close-icon="true"
+          style="display:block; width:100%; text-align:center; padding:14px 16px; border-radius:12px; background:var(--brand-green); color:#fff; font-weight:800;"
+        >Book Now</a>
+        <script async src="https://js.peek.com/widget_bundle_v1.js"></script>
+      </div>
+
+      <div class="host" style="margin-top:14px">
+        <img class="host-avatar" alt="Host" src="media/host.jpg" loading="lazy">
+        <div>
+          <div style="font-weight:800">Hosted by Rebellion Roads</div>
+          <div style="color:var(--ink-60)">Local eBike experts</div>
+        </div>
+      </div>
+
+      <div style="background:var(--accent-peach); border-radius:12px; padding:12px; margin-top:14px; color:#5a3c35; font-weight:600">
+        Private • Personalized • Hand‑picked by locals
+      </div>
+    </aside>
+  </div>
+
+  <!-- Quick highlights block -->
+  <section class="details">
+    <h3 style="margin:0 0 12px 0">Tour Highlights</h3>
+    <ul>
+      <li>Old Village: Kiara's house, Kildare County Sheriff's Office, Kiladare Island Surf Shop</li>
+      <li>Shem Creek: The Wreck, shrimp boats, waterfront boardwalk</li>
+      <li>Breach Inlet: Coastal vistas and "Welcome to the Outer Banks" sign</li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  © Rebellion Roads — 1470 Ben Sawyer Blvd #29, Mt Pleasant, SC • (843) 284‑3120
+  <link rel="prefetch" href="/media/obx-2.jpg">
+  <link rel="prefetch" href="/media/obx-3.jpg">
+  <link rel="prefetch" href="/media/obx-4.jpg">
+  <link rel="prefetch" href="/media/obx-5.jpg">
+</footer>
+
+<script>
+  // Minimal slider with video-first support
+  (function(){
+    const root = document.getElementById('obx-slider');
+    if(!root) {
+      console.error('Slider root not found');
+      return;
+    }
+    
+    const track = root.querySelector('.slides');
+    const slides = Array.from(root.querySelectorAll('.slide'));
+    const prev = root.querySelector('[data-dir="-1"]');
+    const next = root.querySelector('[data-dir="1"]');
+    const progress = root.querySelector('.progress > i');
+    const dotsWrap = root.querySelector('.dots');
+    const card = document.querySelector('.card');
+    
+    console.log('Slider elements found:', { root, track, slides: slides.length, prev, next, progress, dotsWrap });
+    let index = 0;
+    let isTransitioning = false;
+    let timer = null;
+    const autoAdvanceMs = 4000; // 4 seconds
+
+    function setActiveDot(){
+      Array.from(dotsWrap.children).forEach((d, i)=>{
+        d.classList.toggle('active', i === index);
+      });
+    }
+
+    function go(to){
+      if(isTransitioning) return;
+      index = (to + slides.length) % slides.length;
+      isTransitioning = true;
+      track.style.transform = `translateX(-${index*100}%)`;
+      progress.style.width = `${((index+1)/slides.length)*100}%`;
+      setTimeout(()=>{ isTransitioning = false; }, 520);
+      setActiveDot();
+    }
+
+    function restartAuto(){
+      stopAuto();
+      startAuto();
+    }
+
+    if(prev && next) {
+      prev.addEventListener('click', ()=>{ go(index-1); restartAuto(); });
+      next.addEventListener('click', ()=>{ go(index+1); restartAuto(); });
+    } else {
+      console.error('Navigation buttons not found');
+    }
+
+    // Keyboard support
+    root.addEventListener('keydown', (e)=>{
+      if(e.key==='ArrowLeft') go(index-1);
+      if(e.key==='ArrowRight') go(index+1);
+    });
+    root.tabIndex = 0;
+
+    // Basic swipe
+    let startX=0, dx=0, dragging=false;
+    root.addEventListener('pointerdown', e=>{ dragging=true; startX=e.clientX; root.setPointerCapture(e.pointerId); });
+    root.addEventListener('pointermove', e=>{ if(!dragging) return; dx=e.clientX-startX; });
+    root.addEventListener('pointerup', e=>{
+      dragging=false;
+      if(Math.abs(dx)>60){ go(index + (dx<0?1:-1)); }
+      dx=0;
+    });
+
+    // Pause other media when entering a new slide
+    function pauseAll(){
+      slides.forEach(s=>{
+        const v = s.querySelector('video');
+        if(v && !v.paused){ try{ v.pause(); }catch{} }
+      });
+    }
+    track.addEventListener('transitionend', pauseAll);
+
+    // Initialize dots & progress
+    dotsWrap.innerHTML = slides.map(()=>'<span class="dot"></span>').join('');
+    progress.style.width = `${(1/slides.length)*100}%`;
+    setActiveDot();
+
+    function startAuto(){
+      if(timer) return;
+      timer = setInterval(()=>{ go(index+1); }, autoAdvanceMs);
+    }
+
+    function stopAuto(){
+      if(!timer) return;
+      clearInterval(timer); timer = null;
+    }
+
+    // Pause on hover/focus; resume when leaving
+    root.addEventListener('mouseenter', stopAuto);
+    root.addEventListener('mouseleave', startAuto);
+    root.addEventListener('focusin', stopAuto);
+    root.addEventListener('focusout', startAuto);
+    document.addEventListener('visibilitychange', ()=>{
+      if(document.hidden) stopAuto(); else startAuto();
+    });
+
+    startAuto();
+
+    // Keep booking card height aligned with slider (bottoms match)
+    function syncCardHeight(){
+      if(!card) return;
+      if(window.innerWidth > 980){
+        card.style.height = `${root.clientHeight}px`;
+      } else {
+        card.style.height = '';
+      }
+    }
+
+    const ro = new ResizeObserver(syncCardHeight);
+    ro.observe(root);
+    window.addEventListener('resize', syncCardHeight);
+
+    // initial after images settle
+    setTimeout(syncCardHeight, 300);
+
+    // Host avatar: pick first available image from media folder
+    (function(){
+      const avatar = document.querySelector('.host-avatar');
+      if(!avatar) return;
+      const candidates = [
+        'host.jpg','host.jpeg','host.png','host.webp','host.gif',
+        'profile.jpg','profile.jpeg','profile.png','profile.webp',
+        'avatar.jpg','avatar.jpeg','avatar.png','avatar.webp',
+        'guide.jpg','guide.jpeg','guide.png','guide.webp'
+      ];
+      let tried = 0;
+      function tryNext(){
+        if(tried >= candidates.length) return;
+        const name = candidates[tried++];
+        const url = `media/${name}`;
+        const img = new Image();
+        img.onload = ()=>{ avatar.src = url; };
+        img.onerror = tryNext;
+        img.src = url;
+      }
+      // If default fails, iterate
+      avatar.addEventListener('error', tryNext, { once:true });
+      // Kick off in case the default already fails before listener attaches
+      setTimeout(()=>{ if(!avatar.complete || avatar.naturalWidth === 0) tryNext(); }, 50);
+    })();
+  })();
+</script>
+
+</body>
+</html>
